@@ -1,0 +1,19 @@
+[Unit]
+Description=Plasmit Subscription Service
+After=network.target mysql.service
+
+[Service]
+User=www-data
+WorkingDirectory=/opt/plasmit-subscription-service
+ExecStart=/usr/bin/java -jar /opt/plasmit-subscription-service/target/subscription-service-0.0.1-SNAPSHOT.jar
+SuccessExitStatus=143
+Restart=always
+RestartSec=5
+
+Environment=SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/hospital_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata
+Environment=SPRING_DATASOURCE_USERNAME=hospital_app
+Environment=SPRING_DATASOURCE_PASSWORD=change-me
+Environment=JWT_SECRET=change-me
+
+[Install]
+WantedBy=multi-user.target

@@ -48,19 +48,38 @@ Default configuration is in `src/main/resources/application.properties`.
 spring.application.name=subscription-service
 server.port=8083
 
-spring.datasource.url=jdbc:mysql://localhost:3306/plasmit_auth?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata
-spring.datasource.username=root
-spring.datasource.password=<your-database-password>
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/hospital_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:hospital_app}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}
 
-jwt.secret=<same-secret-used-by-auth-service>
+jwt.secret=${JWT_SECRET:<same-secret-used-by-auth-service>}
 ```
 
 Before running locally, make sure:
 
 - MySQL is running.
-- The `plasmit_auth` database exists.
+- The same database used by auth and dashboard exists. The default name is `hospital_db`.
 - The database contains the `hospitals`, `subscription_plans`, and `hospital_subscriptions` tables.
-- `jwt.secret` matches the service that issues login tokens.
+- `JWT_SECRET` matches the service that issues login tokens.
+
+## VPS Database Setup
+
+Use the same MySQL database that auth and dashboard use. If the database is named `hospital_db`, the grant must also target `hospital_db.*`.
+
+```sql
+CREATE DATABASE IF NOT EXISTS hospital_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'hospital_app'@'localhost' IDENTIFIED BY '<password>';
+GRANT ALL PRIVILEGES ON hospital_db.* TO 'hospital_app'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Create the subscription tables in that same database:
+
+```bash
+mysql -u hospital_app -p hospital_db < deploy/mysql-subscription-tables.sql
+```
+
+If auth and dashboard already use a different database name, replace `hospital_db` everywhere with that existing database name.
 
 ## Run Locally
 
@@ -95,6 +114,40 @@ On macOS/Linux:
 ```bash
 ./mvnw clean package
 ```
+
+## VPS Deployment
+
+Build the jar on the VPS or upload a built jar:
+
+```bash
+./mvnw clean package
+```
+
+The service can run under systemd like the auth and dashboard services. A sample unit is available at:
+
+```text
+deploy/plasmit-subscription-service.service.example
+```
+
+Copy it to `/etc/systemd/system/plasmit-subscription-service.service`, then update:
+
+- `WorkingDirectory`
+- `ExecStart`
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+- `JWT_SECRET`
+
+Then enable and start it:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable plasmit-subscription-service
+sudo systemctl restart plasmit-subscription-service
+sudo systemctl status plasmit-subscription-service
+```
+
+The service listens on port `8083` by default.
 
 ## Authentication
 
