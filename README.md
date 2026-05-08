@@ -48,7 +48,7 @@ Default configuration is in `src/main/resources/application.properties`.
 spring.application.name=subscription-service
 server.port=8083
 
-spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/hospital_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata}
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/plasmit_auth?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata}
 spring.datasource.username=${SPRING_DATASOURCE_USERNAME:hospital_app}
 spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}
 
@@ -58,28 +58,28 @@ jwt.secret=${JWT_SECRET:<same-secret-used-by-auth-service>}
 Before running locally, make sure:
 
 - MySQL is running.
-- The same database used by auth and dashboard exists. The default name is `hospital_db`.
+- The same database used by auth and dashboard exists. The default name is `plasmit_auth`.
 - The database contains the `hospitals`, `subscription_plans`, and `hospital_subscriptions` tables.
 - `JWT_SECRET` matches the service that issues login tokens.
 
 ## VPS Database Setup
 
-Use the same MySQL database that auth and dashboard use. If the database is named `hospital_db`, the grant must also target `hospital_db.*`.
+Use the same MySQL database that auth and dashboard use. If the database is named `plasmit_auth`, the grant must also target `plasmit_auth.*`.
 
 ```sql
-CREATE DATABASE IF NOT EXISTS hospital_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS plasmit_auth CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS 'hospital_app'@'localhost' IDENTIFIED BY '<password>';
-GRANT ALL PRIVILEGES ON hospital_db.* TO 'hospital_app'@'localhost';
+GRANT ALL PRIVILEGES ON plasmit_auth.* TO 'hospital_app'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
 Create the subscription tables in that same database:
 
 ```bash
-mysql -u hospital_app -p hospital_db < deploy/mysql-subscription-tables.sql
+mysql -u hospital_app -p plasmit_auth < deploy/mysql-subscription-tables.sql
 ```
 
-If auth and dashboard already use a different database name, replace `hospital_db` everywhere with that existing database name.
+If auth and dashboard already use a different database name, replace `plasmit_auth` everywhere with that existing database name.
 
 ## Run Locally
 

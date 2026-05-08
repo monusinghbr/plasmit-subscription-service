@@ -44,3 +44,41 @@ CREATE TABLE IF NOT EXISTS hospital_subscriptions (
     CONSTRAINT fk_hospital_subscriptions_plan
         FOREIGN KEY (plan_id) REFERENCES subscription_plans (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP PROCEDURE IF EXISTS add_column_if_missing;
+
+DELIMITER //
+
+CREATE PROCEDURE add_column_if_missing(
+    IN p_table_name VARCHAR(64),
+    IN p_column_name VARCHAR(64),
+    IN p_column_definition TEXT
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = DATABASE()
+          AND table_name = p_table_name
+          AND column_name = p_column_name
+    ) THEN
+        SET @ddl = CONCAT(
+            'ALTER TABLE `',
+            REPLACE(p_table_name, '`', '``'),
+            '` ADD COLUMN `',
+            REPLACE(p_column_name, '`', '``'),
+            '` ',
+            p_column_definition
+        );
+        PREPARE stmt FROM @ddl;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END IF;
+END//
+
+DELIMITER ;
+
+CALL add_column_if_missing('hospital_subscriptions', 'created_by', 'BIGINT NULL AFTER `invoice_number`');
+CALL add_column_if_missing('hospital_subscriptions', 'updated_by', 'BIGINT NULL AFTER `created_by`');
+
+DROP PROCEDURE IF EXISTS add_column_if_missing;
