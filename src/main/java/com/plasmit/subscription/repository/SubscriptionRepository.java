@@ -134,10 +134,10 @@ public class SubscriptionRepository {
         String sql = """
                 INSERT INTO hospital_subscriptions
                 (hospital_id, plan_id, start_date, end_date, status, payment_status,
-                 renewal_date, invoice_number, created_by)
+                 renewal_date, invoice_number)
                 VALUES
                 (:hospitalId, :planId, :startDate, :endDate, :status, :paymentStatus,
-                 :endDate, :invoiceNumber, :createdBy)
+                 :endDate, :invoiceNumber)
                 """;
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -149,8 +149,7 @@ public class SubscriptionRepository {
                 .addValue("endDate", request.getEndDate())
                 .addValue("status", request.getStatus())
                 .addValue("paymentStatus", request.getPaymentStatus())
-                .addValue("invoiceNumber", request.getInvoiceNumber())
-                .addValue("createdBy", userId), keyHolder);
+                .addValue("invoiceNumber", request.getInvoiceNumber()), keyHolder);
 
         return keyHolder.getKey() == null ? null : keyHolder.getKey().longValue();
     }
@@ -214,7 +213,6 @@ public class SubscriptionRepository {
                 SET plan_id = :planId,
                     status = :status,
                     payment_status = :paymentStatus,
-                    updated_by = :updatedBy,
                     updated_at = NOW()
                 WHERE id = :mappingId
                   AND is_deleted = 0
@@ -224,7 +222,6 @@ public class SubscriptionRepository {
                 .addValue("mappingId", mappingId)
                 .addValue("planId", request.getPlanId())
                 .addValue("status", request.getStatus())
-                .addValue("paymentStatus", request.getPaymentStatus())
-                .addValue("updatedBy", userId));
+                .addValue("paymentStatus", request.getPaymentStatus()));
     }
 }
