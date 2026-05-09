@@ -50,7 +50,7 @@ server.port=8083
 
 spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/plasmit_auth?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata}
 spring.datasource.username=${SPRING_DATASOURCE_USERNAME:hospital_app}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:HospitalApp@123}
 
 jwt.secret=${JWT_SECRET:<same-secret-used-by-auth-service>}
 ```

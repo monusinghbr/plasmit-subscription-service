@@ -169,7 +169,7 @@ public class SubscriptionRepository {
                        hs.invoice_number
                 FROM hospital_subscriptions hs
                 JOIN hospitals h ON h.id = hs.hospital_id
-                JOIN subscription_plans sp ON sp.id = hs.plan_id
+                LEFT JOIN subscription_plans sp ON sp.id = hs.plan_id
                 WHERE hs.is_deleted = 0
                 """);
 
@@ -198,7 +198,7 @@ public class SubscriptionRepository {
                         rs.getLong("hospital_id"),
                         rs.getString("hospital_name"),
                         rs.getString("hospital_code"),
-                        rs.getLong("plan_id"),
+                        rs.getObject("plan_id") == null ? null : rs.getLong("plan_id"),
                         rs.getString("plan_name"),
                         rs.getString("subscription_status"),
                         rs.getString("payment_status"),
