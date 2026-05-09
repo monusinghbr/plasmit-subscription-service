@@ -142,12 +142,60 @@ Then enable and start it:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable plasmit-subscription-service
-sudo systemctl restart plasmit-subscription-service
-sudo systemctl status plasmit-subscription-service
+sudo systemctl enable plasmit-subscription-service.service
+sudo systemctl restart plasmit-subscription-service.service
+sudo systemctl status plasmit-subscription-service.service --no-pager
 ```
 
 The service listens on port `8083` by default.
+
+To deploy the latest patch from this repository on the VPS:
+
+```bash
+cd /opt/plasmit/plasmit-subscription-service
+bash deploy/update-subscription-service.sh
+```
+
+The update script pulls `origin/main`, builds the jar, restarts `plasmit-subscription-service.service`, checks port `8083`, and prints the deployed commit.
+
+If `/opt/plasmit/plasmit-subscription-service` does not exist on the VPS, first check where systemd currently runs the service from:
+
+```bash
+sudo systemctl cat plasmit-subscription-service.service
+sudo systemctl show plasmit-subscription-service.service -p WorkingDirectory -p ExecStart
+```
+
+If there is no subscription service project folder under `/opt/plasmit`, clone it:
+
+```bash
+cd /opt/plasmit
+git clone git@github.com:monusinghbr/plasmit-subscription-service.git plasmit-subscription-service
+cd plasmit-subscription-service
+bash deploy/update-subscription-service.sh
+```
+
+To check auto-start for all Plasmit systemd services:
+
+```bash
+bash deploy/check-plasmit-services.sh
+```
+
+Equivalent direct command:
+
+```bash
+systemctl is-enabled \
+plasmit-auth.service \
+plasmit-super-admin.service \
+plasmit-subscription-service.service \
+plasmit-hospital-core.service \
+plasmit-patient-hospital.service \
+plasmit-appointment-hospital.service \
+plasmit-lab-hospital.service \
+plasmit-billing-hospital.service \
+plasmit-prescription-hospital.service \
+plasmit-pharmacy-hospital.service \
+plasmit-pharmacy-sales-hospital.service
+```
 
 ## Authentication
 
